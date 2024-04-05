@@ -82,26 +82,23 @@ class _GroceryListState extends State<GroceryList> {
     });*/
   }
 
-  void _removeItem(GroceryItem item) {
+  void _removeItem(GroceryItem item) async {
     final index = _groceryItems.indexOf(item);
     setState(() {
       _groceryItems.remove(item);
     });
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 3),
-        content: const Text('Grocery Item deleted.'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            setState(() {
-              _groceryItems.insert(index, item);
-            });
-          },
-        ),
-      ),
+    final url = Uri.https(
+      'tuto-9ef88-default-rtdb.firebaseio.com',
+      'shopping-list/${item.id}.json',
     );
+
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      setState(() {
+        _groceryItems.insert(index, item);
+      });
+    }
   }
 
   @override
@@ -142,12 +139,15 @@ class _GroceryListState extends State<GroceryList> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Your Groceries'), actions: [
-        IconButton(
-          onPressed: _addItem,
-          icon: const Icon(Icons.add),
-        )
-      ]),
+      appBar: AppBar(
+        title: const Text('Your Groceries'),
+        actions: [
+          IconButton(
+            onPressed: _addItem,
+            icon: const Icon(Icons.add),
+          )
+        ],
+      ),
       body: content,
     );
   }
