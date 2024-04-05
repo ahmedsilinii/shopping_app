@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shopping_app/data/categories.dart';
 import 'package:shopping_app/models/category.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopping_app/models/grocery_item.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -28,8 +29,7 @@ class _NewItemState extends State<NewItem> {
         'tuto-9ef88-default-rtdb.firebaseio.com',
         'shopping-list.json',
       );
-      //final response = await
-      http.post(
+      final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -43,8 +43,21 @@ class _NewItemState extends State<NewItem> {
         ),
       );
 
+      /*1ere methode
       // ignore: use_build_context_synchronously
       Navigator.of(context).pop();
+      */
+
+      final resData = json.decode(response.body);
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pop(
+        GroceryItem(
+          id: resData['name'],
+          name: _enteredName,
+          quantity: _enteredQuantity,
+          category: _selectedCategory,
+        ),
+      );
 
       /* before backend :3
       Navigator.of(context).pop(
